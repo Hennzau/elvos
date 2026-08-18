@@ -1,0 +1,13 @@
+mkosi.output
+mkosi.cache
+.mkosi*
+mkosi.crt
+mkosi.key
+mkosi.tools*
+target-disk.qcow2
+ovmf-vars.fd
+ovmf-code.fd
+run.sh
+flash.sh
+tpm.sh
+live.sh

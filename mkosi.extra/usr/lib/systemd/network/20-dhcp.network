@@ -1,0 +1,14 @@
+[Match]
+Name=en* eth* wl*
+
+[Network]
+DHCP=yes
+IPv6AcceptRA=yes
+MulticastDNS=yes
+LLMNR=no
+
+[DHCPv4]
+UseDomains=yes
+
+[IPv6AcceptRA]
+UseDomains=yes
