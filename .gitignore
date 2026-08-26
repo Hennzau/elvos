@@ -11,3 +11,5 @@ run.sh
 flash.sh
 tpm.sh
 live.sh
+.*
+!.zed

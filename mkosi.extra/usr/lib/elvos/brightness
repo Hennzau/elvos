@@ -1,0 +1,54 @@
+#!/bin/bash
+set -eu -o pipefail
+
+step=5
+floor=1
+
+usage() {
+        echo "usage: ${0##*/} up|down|set <percent>" >&2
+        exit 2
+}
+
+shopt -s nullglob
+devices=(/sys/class/backlight/*)
+
+if [[ ${#devices[@]} -eq 0 ]]; then
+        echo "${0##*/}: no backlight device" >&2
+        exit 1
+fi
+
+device=${devices[0]}
+name=${device##*/}
+
+max=$(<"$device/max_brightness")
+
+current=$(<"$device/brightness")
+
+delta=$(( max * step / 100 ))
+if [[ $delta -lt 1 ]]; then
+        delta=1
+fi
+
+case ${1:-} in
+up)   target=$(( current + delta )) ;;
+down) target=$(( current - delta )) ;;
+set)
+        [[ ${2:-} =~ ^[0-9]+$ ]] || usage
+        target=$(( max * $2 / 100 ))
+        ;;
+*) usage ;;
+esac
+
+if [[ $target -lt $floor ]]; then
+        target=$floor
+fi
+
+if [[ $target -gt $max ]]; then
+        target=$max
+fi
+
+exec busctl --system --quiet call \
+        org.freedesktop.login1 \
+        /org/freedesktop/login1/session/auto \
+        org.freedesktop.login1.Session \
+        SetBrightness ssu backlight "$name" "$target"

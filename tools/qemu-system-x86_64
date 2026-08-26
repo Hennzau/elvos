@@ -1,0 +1,66 @@
+#!/bin/sh
+src=""
+if command -v pactl >/dev/null 2>&1; then
+        src=$(pactl list short sources 2>/dev/null |
+              awk '$2 !~ /\.monitor$/ { print $2; exit }')
+fi
+
+gl=""
+if [ -e /usr/lib/qemu/hw-display-virtio-vga-gl.so ]; then
+        gl=yes
+fi
+
+venus=""
+if [ -n "$gl" ] && grep -qa venus /usr/lib/libvirglrenderer.so.1 2>/dev/null; then
+        venus=yes
+fi
+
+ram=4096M
+prev=""
+for a in "$@"; do
+        [ "$prev" = "-m" ] && ram=$a
+        prev=$a
+done
+
+vga=virtio-vga-gl
+gpu=virtio-gpu-gl-pci
+if [ -n "$venus" ]; then
+        vga="$vga,hostmem=4G,blob=true,venus=true"
+        gpu="$gpu,hostmem=4G,blob=true,venus=true"
+fi
+
+if [ -n "$src" ] || [ -n "$gl" ]; then
+        n=$#
+        i=0
+        prev=""
+        while [ "$i" -lt "$n" ]; do
+                a=$1
+                shift
+                case $a in
+                *driver=pipewire*|pipewire,*)
+                        case $a in
+                        *in.name=*) ;;
+                        *) [ -n "$src" ] && a="$a,in.name=$src" ;;
+                        esac
+                        ;;
+                virtio-vga)
+                        [ -n "$gl" ] && a=$vga
+                        ;;
+                virtio-gpu-pci)
+                        [ -n "$gl" ] && a=$gpu
+                        ;;
+                esac
+                if [ "$prev" = "-machine" ] && [ -n "$venus" ]; then
+                        a="$a,memory-backend=mem"
+                fi
+                prev=$a
+                set -- "$@" "$a"
+                i=$((i + 1))
+        done
+
+        if [ -n "$venus" ]; then
+                set -- -object "memory-backend-memfd,id=mem,size=$ram,share=on" "$@"
+        fi
+fi
+
+exec setpriv --ambient-caps=-all /usr/bin/qemu-system-x86_64 "$@"

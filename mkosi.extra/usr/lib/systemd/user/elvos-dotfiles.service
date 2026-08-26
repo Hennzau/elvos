@@ -1,0 +1,14 @@
+[Unit]
+Description=Apply the image's dotfiles into the home directory
+Documentation=https://www.chezmoi.io/reference/commands/apply/
+ConditionUser=!@system
+ConditionPathIsDirectory=/usr/share/elvos/dotfiles
+Before=niri.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/chezmoi apply --force --no-tty --source=/usr/share/elvos/dotfiles
+
+[Install]
+WantedBy=default.target

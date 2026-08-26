@@ -1,0 +1,10 @@
+#!/bin/bash
+set -eu -o pipefail
+
+config="${XDG_CONFIG_HOME:-$HOME/.config}/mako/config"
+
+if [[ -f $config || -f $HOME/.mako/config ]]; then
+        exec mako "$@"
+fi
+
+exec mako --config /usr/share/elvos/dotfiles/dot_config/mako/create_config "$@"

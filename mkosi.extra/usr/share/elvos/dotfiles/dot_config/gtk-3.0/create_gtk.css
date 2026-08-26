@@ -1,0 +1,168 @@
+@define-color theme_bg_color #faf4ed;
+@define-color theme_fg_color #575279;
+@define-color theme_base_color #fffaf3;
+@define-color theme_text_color #575279;
+@define-color theme_selected_bg_color #286983;
+@define-color theme_selected_fg_color #faf4ed;
+
+@define-color insensitive_bg_color #f2e9e1;
+@define-color insensitive_fg_color #9893a5;
+@define-color insensitive_base_color #faf4ed;
+@define-color unfocused_insensitive_color #9893a5;
+
+@define-color theme_unfocused_bg_color #faf4ed;
+@define-color theme_unfocused_fg_color #797593;
+@define-color theme_unfocused_base_color #fffaf3;
+@define-color theme_unfocused_text_color #575279;
+@define-color theme_unfocused_selected_bg_color #dfdad9;
+@define-color theme_unfocused_selected_fg_color #575279;
+
+@define-color borders #dfdad9;
+@define-color unfocused_borders #eae3da;
+
+@define-color content_view_bg #fffaf3;
+@define-color text_view_bg #fffaf3;
+
+@define-color warning_color #9f6310;
+@define-color error_color #ad546e;
+@define-color success_color #3c7d52;
+
+@define-color wm_bg_a #f2e9e1;
+@define-color wm_bg_b #f2e9e1;
+@define-color wm_border #dfdad9;
+@define-color wm_borders_edge #fffaf3;
+@define-color wm_highlight #fffaf3;
+@define-color wm_shadow rgba(87, 82, 121, 0.25);
+@define-color wm_title #575279;
+@define-color wm_unfocused_title #797593;
+
+window,
+window.background,
+.background,
+dialog,
+messagedialog {
+  background-color: #faf4ed;
+  color: #575279;
+}
+
+headerbar,
+headerbar.default-decoration,
+.titlebar:not(headerbar) {
+  background-image: none;
+  background-color: #f2e9e1;
+  color: #575279;
+  border-color: #dfdad9;
+  box-shadow: none;
+}
+
+headerbar:backdrop,
+headerbar.default-decoration:backdrop,
+.titlebar:not(headerbar):backdrop {
+  background-image: none;
+  background-color: #eae3da;
+  color: #797593;
+  border-color: #eae3da;
+}
+
+entry,
+entry text,
+spinbutton:not(.vertical),
+textview,
+textview text,
+treeview.view,
+iconview,
+.view {
+  background-color: #fffaf3;
+  color: #575279;
+}
+
+entry,
+spinbutton:not(.vertical) {
+  border-color: #dfdad9;
+}
+
+entry:focus,
+entry:focus-within,
+spinbutton:not(.vertical):focus-within {
+  border-color: #286983;
+}
+
+entry selection,
+textview text selection,
+label selection,
+treeview.view:selected,
+list row:selected,
+flowbox flowboxchild:selected,
+menuitem:hover,
+modelbutton:hover {
+  background-color: #286983;
+  color: #faf4ed;
+}
+
+.sidebar,
+placessidebar,
+placessidebar list,
+stacksidebar,
+stacksidebar list {
+  background-color: #f2e9e1;
+  color: #575279;
+}
+
+popover,
+popover.background,
+popover contents,
+menu,
+.menu,
+.context-menu {
+  background-color: #fffaf3;
+  color: #575279;
+  border-color: #dfdad9;
+}
+
+tooltip,
+tooltip.background {
+  background-color: #575279;
+  color: #faf4ed;
+}
+
+scrollbar,
+scrollbar.overlay-indicator {
+  background-color: #faf4ed;
+  border-color: #dfdad9;
+}
+
+scrollbar slider {
+  background-color: #cecacd;
+}
+
+scrollbar slider:hover {
+  background-color: #9893a5;
+}
+
+separator {
+  background-color: #dfdad9;
+}
+
+button.suggested-action {
+  background-image: none;
+  background-color: #286983;
+  color: #faf4ed;
+  border-color: #286983;
+}
+
+button.destructive-action {
+  background-image: none;
+  background-color: #ad546e;
+  color: #faf4ed;
+  border-color: #ad546e;
+}
+
+infobar.warning > revealer > box {
+  background-color: #ea9d34;
+  color: rgba(0, 0, 6, 0.8);
+}
+
+infobar.error > revealer > box {
+  background-color: #ad546e;
+  color: #faf4ed;
+}
