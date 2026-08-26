@@ -71,11 +71,6 @@ def "elvos version" [] {
     | parse --regex '^(?<key>[A-Z0-9_]+)="?(?<value>.*?)"?$'
 }
 
-def "elvos versions" [] {
-    let sysupdate = (elvos-sysupdate)
-    ^$sysupdate list
-}
-
 const elvos_dotfiles = "/usr/share/elvos/dotfiles"
 
 def "elvos config list" [] {
@@ -86,31 +81,10 @@ def "elvos config apply" [] {
     chezmoi apply --force --no-tty --source $elvos_dotfiles
 }
 
-def "elvos config diff" [] {
-    chezmoi managed --source $elvos_dotfiles --include files
+def "elvos config reset" [] {
+    elvos config list
     | lines
-    | each {|target|
-        let path = ($nu.home-dir | path join $target)
-        if not ($path | path exists) { return null }
+    | each { |it| $env.HOME | path join $it } | each { |it| rm $it }
 
-        let source = (chezmoi source-path --source $elvos_dotfiles $path | str trim)
-        let result = (do {
-            git --no-pager diff --no-index --color=always $source $path
-        } | complete)
-
-        if ($result.stdout | is-empty) { null } else { $result.stdout }
-    }
-    | compact
-    | str join "\n"
-}
-
-def "elvos config reset" [target: path] {
-    let path = ($target | path expand)
-
-    if not ($path | path exists) {
-        error make { msg: $"($path) does not exist" }
-    }
-
-    rm --force $path
     elvos config apply
 }

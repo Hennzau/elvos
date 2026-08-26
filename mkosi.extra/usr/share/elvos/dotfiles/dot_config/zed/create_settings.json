@@ -6,36 +6,38 @@
     "autosave": "on_focus_change",
     "format_on_save": "on",
     "terminal": {
-        "shell": { "program": "/bin/nu" },
+        "shell": { "program": "/bin/nu" }
     },
     "project_panel": {
-        "dock": "left",
+        "dock": "left"
     },
     "auto_install_extensions": {
         "toml": true,
         "html": true,
         "nu": true,
         "git-firefly": true,
+        "qml": true,
+        "ini": true
     },
 
     "telemetry": {
         "diagnostics": false,
-        "metrics": false,
+        "metrics": false
     },
 
     "tab_size": 4,
     "preferred_line_length": 100,
     "show_whitespaces": "selection",
     "indent_guides": {
-        "enabled": true,
+        "enabled": true
     },
 
     "scrollbar": {
-        "show": "auto",
+        "show": "auto"
     },
 
     "buffer_font_family": ".ZedMono",
     "buffer_font_size": 15,
     "ui_font_family": ".ZedSans",
-    "ui_font_size": 15,
+    "ui_font_size": 15
 }

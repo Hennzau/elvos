@@ -1,0 +1,8 @@
+[lockscreen]
+enabled               = true
+lock_before_suspend   = true
+allow_empty_password  = false
+blur_intensity        = 0.0
+tint_intensity        = 0.0
+wallpaper             = "/home/enzo/elvos/mkosi.extra/usr/share/elvos/wallpaper.jpg"
+monitors              = []

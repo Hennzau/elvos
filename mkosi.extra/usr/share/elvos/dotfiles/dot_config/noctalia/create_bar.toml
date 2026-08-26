@@ -1,0 +1,43 @@
+[bar]
+order = ["main"]
+
+[bar.default]
+position           = "top"
+enabled            = true
+auto_hide          = false
+smart_auto_hide    = false
+show_on_workspace_switch = true
+reserve_space      = true
+layer              = "top"
+
+thickness          = 24
+background_opacity = 1.0
+border             = "outline"
+border_width       = 0.0
+shadow             = true
+contact_shadow     = false
+panel_overlap      = 0
+radius             = 4
+radius_top_left    = 2
+radius_top_right   = 2
+concave_edge_corners = false
+margin_ends        = 0
+margin_edge        = 0
+margin_opposite_edge = 0
+padding            = 16
+widget_spacing     = 8
+hover_highlight    = true
+scale              = 1.0
+font_scale         = 1.0
+font_weight        = 500
+font_family        = "Zed Mono"
+
+capsule            = false
+capsule_fill       = "surface_variant"
+capsule_thickness  = 0.76
+capsule_radius     = 8.0
+capsule_opacity    = 1.0
+
+start  = ["workspaces"]
+center = ["clock", "notifications"]
+end    = ["network", "battery", "session"]

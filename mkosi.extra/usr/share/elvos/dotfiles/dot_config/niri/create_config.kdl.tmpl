@@ -28,17 +28,17 @@ layout {
 
     focus-ring {
         width 3
-        active-gradient from="#286983" to="#907aa9" angle=45 relative-to="workspace-view"
-        inactive-color "#dfdad9"
-        urgent-color "#b4637a"
+        active-gradient from="{{ .palette.accent.gradient_from }}" to="{{ .palette.accent.gradient_to }}" angle=45 relative-to="workspace-view"
+        inactive-color "{{ .palette.border.default }}"
+        urgent-color "{{ .palette.state.error }}"
     }
 
     border {
         off
         width 3
-        active-color "#286983"
-        inactive-color "#dfdad9"
-        urgent-color "#b4637a"
+        active-color "{{ .palette.accent.primary }}"
+        inactive-color "{{ .palette.border.default }}"
+        urgent-color "{{ .palette.state.error }}"
     }
 
     shadow {
@@ -46,7 +46,7 @@ layout {
         softness 24
         spread 3
         offset x=0 y=6
-        color "#57527926"
+        color "{{ .palette.shade.shadow.rgba }}"
     }
 
     tab-indicator {
@@ -57,15 +57,15 @@ layout {
         length total-proportion=0.6
         position "left"
         corner-radius 4
-        active-color "#286983"
-        inactive-color "#dfdad9"
+        active-color "{{ .palette.accent.primary }}"
+        inactive-color "{{ .palette.border.default }}"
     }
 
     insert-hint {
-        gradient from="#28698359" to="#907aa959" angle=45 relative-to="workspace-view"
+        gradient from="{{ .palette.accent.gradient_from_soft.rgba }}" to="{{ .palette.accent.gradient_to_soft.rgba }}" angle=45 relative-to="workspace-view"
     }
 
-    background-color "#faf4ed"
+    background-color "transparent"
 
     struts {
     }
@@ -73,7 +73,7 @@ layout {
 
 overview {
     zoom 0.5
-    backdrop-color "#eae3da"
+    backdrop-color "{{ .palette.bg.canvas }}"
 }
 
 xwayland-satellite { path "/usr/bin/xwayland-satellite"; }
@@ -90,14 +90,29 @@ screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 hotkey-overlay { skip-at-startup; }
 
-spawn-at-startup "/usr/lib/elvos/mako-start"
+spawn-at-startup "noctalia"
+debug { honor-xdg-activation-with-invalid-serial; }
 
+window-rule { match app-id="dev.noctalia.Noctalia"; open-floating true; default-column-width { fixed 1080; }; default-window-height { fixed 920; }; }
 window-rule { geometry-corner-radius 10; clip-to-geometry true; min-width 300; min-height 300; }
 window-rule { match app-id=r#"firefox$"# title="^Picture-in-Picture$"; open-floating true; }
 window-rule { match app-id=r#"Alacritty$"#; default-column-width { proportion 0.5; }; }
 
+layer-rule { match namespace="^noctalia-wallpaper"; place-within-backdrop true; }
+
 binds {
     Mod+Shift+D { show-hotkey-overlay; }
+
+    Mod+D { spawn-sh "noctalia msg panel-toggle launcher"; }
+    Mod+S { spawn-sh "noctalia msg panel-toggle control-center"; }
+    Mod+P { spawn-sh "noctalia msg session lock"; }
+    Mod+I { spawn-sh "noctalia msg session lock-and-suspend"; }
+
+    XF86AudioRaiseVolume { spawn-sh "noctalia msg volume-up"; }
+    XF86AudioLowerVolume { spawn-sh "noctalia msg volume-down"; }
+    XF86AudioMute { spawn-sh "noctalia msg volume-mute"; }
+    XF86MonBrightnessUp { spawn-sh "noctalia msg brightness-up"; }
+    XF86MonBrightnessDown { spawn-sh "noctalia msg brightness-down"; }
 
     Mod+Left  { focus-column-or-monitor-left; }
     Mod+Down  { focus-window-or-workspace-down; }
@@ -132,19 +147,11 @@ binds {
     Mod+u { set-window-width "-10%"; }
     Mod+o { set-window-width "+10%"; }
 
-    XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+ -l 1.0"; }
-    XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"; }
-    XF86AudioMute        allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
-    XF86MonBrightnessUp   allow-when-locked=true { spawn "/usr/lib/elvos/brightness" "up"; }
-    XF86MonBrightnessDown allow-when-locked=true { spawn "/usr/lib/elvos/brightness" "down"; }
-
     Mod+R { maximize-column; }
     Mod+F { fullscreen-window; }
 
     Mod+Shift+A { close-window; }
     Mod+Return { spawn "alacritty"; }
-    Mod+D { spawn "fuzzel"; }
     Mod+Shift+E { quit; }
     Mod+Shift+P { power-off-monitors; }
 
@@ -152,3 +159,5 @@ binds {
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
 }
+
+switch-events { lid-close { spawn "noctalia" "msg" "session" "lock-and-suspend"; }; }

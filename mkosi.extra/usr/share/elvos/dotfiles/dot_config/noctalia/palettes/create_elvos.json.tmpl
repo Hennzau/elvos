@@ -1,0 +1,104 @@
+{{/*
+    elvOS palette for noctalia — derived from .chezmoidata/palette.yml (One Light).
+
+    noctalia is QML: Qt parses "#rrggbb" and "#aarrggbb" (ARGB order, not RGBA),
+    so an 8-digit RGBA string from the palette would be read wrong. Every token
+    below is therefore either a bare opaque value or an explicit `.rgb`.
+
+    One Light has no dark counterpart, so both sections resolve to the same
+    tokens: the bar keeps the elvOS look whichever mode noctalia is in.
+*/ -}}
+{
+    "dark": {
+        "mPrimary": "{{ .palette.accent.primary }}",
+        "mOnPrimary": "{{ .palette.bg.editor }}",
+        "mSecondary": "{{ .palette.accent.secondary }}",
+        "mOnSecondary": "{{ .palette.bg.editor }}",
+        "mTertiary": "{{ .palette.accent.primary }}",
+        "mOnTertiary": "{{ .palette.bg.editor }}",
+        "mError": "{{ .palette.state.error }}",
+        "mOnError": "{{ .palette.bg.editor }}",
+        "mSurface": "{{ .palette.bg.surface }}",
+        "mOnSurface": "{{ .palette.fg.primary }}",
+        "mSurfaceVariant": "{{ .palette.bg.element_hover }}",
+        "mOnSurfaceVariant": "{{ .palette.fg.muted }}",
+        "mOutline": "{{ .palette.border.default }}",
+        "mShadow": "{{ .palette.misc.black }}",
+        "mHover": "{{ .palette.bg.element_hover }}",
+        "mOnHover": "{{ .palette.fg.primary }}",
+        "terminal": {
+            "background": "{{ .palette.bg.terminal }}",
+            "foreground": "{{ .palette.fg.terminal }}",
+            "cursor": "{{ .palette.accent.primary }}",
+            "cursorText": "{{ .palette.bg.terminal }}",
+            "selectionBg": "{{ .palette.cursor_selection.blue.rgb }}",
+            "selectionFg": "{{ .palette.fg.primary }}",
+            "normal": {
+                "black": "{{ .palette.ansi.black }}",
+                "red": "{{ .palette.ansi.red }}",
+                "green": "{{ .palette.ansi.green }}",
+                "yellow": "{{ .palette.ansi.yellow }}",
+                "blue": "{{ .palette.ansi.blue }}",
+                "magenta": "{{ .palette.ansi.magenta }}",
+                "cyan": "{{ .palette.ansi.cyan }}",
+                "white": "{{ .palette.ansi.white }}"
+            },
+            "bright": {
+                "black": "{{ .palette.ansi.bright_black }}",
+                "red": "{{ .palette.ansi.bright_red }}",
+                "green": "{{ .palette.ansi.bright_green }}",
+                "yellow": "{{ .palette.ansi.bright_yellow }}",
+                "blue": "{{ .palette.ansi.bright_blue }}",
+                "magenta": "{{ .palette.ansi.bright_magenta }}",
+                "cyan": "{{ .palette.ansi.bright_cyan }}",
+                "white": "{{ .palette.ansi.bright_white }}"
+            }
+        }
+    },
+    "light": {
+        "mPrimary": "{{ .palette.accent.primary }}",
+        "mOnPrimary": "{{ .palette.bg.editor }}",
+        "mSecondary": "{{ .palette.accent.secondary }}",
+        "mOnSecondary": "{{ .palette.bg.editor }}",
+        "mTertiary": "{{ .palette.accent.primary }}",
+        "mOnTertiary": "{{ .palette.bg.editor }}",
+        "mError": "{{ .palette.state.error }}",
+        "mOnError": "{{ .palette.bg.editor }}",
+        "mSurface": "{{ .palette.bg.surface }}",
+        "mOnSurface": "{{ .palette.fg.primary }}",
+        "mSurfaceVariant": "{{ .palette.bg.element_hover }}",
+        "mOnSurfaceVariant": "{{ .palette.fg.muted }}",
+        "mOutline": "{{ .palette.border.default }}",
+        "mShadow": "{{ .palette.misc.black }}",
+        "mHover": "{{ .palette.bg.element_hover }}",
+        "mOnHover": "{{ .palette.fg.primary }}",
+        "terminal": {
+            "background": "{{ .palette.bg.terminal }}",
+            "foreground": "{{ .palette.fg.terminal }}",
+            "cursor": "{{ .palette.accent.primary }}",
+            "cursorText": "{{ .palette.bg.terminal }}",
+            "selectionBg": "{{ .palette.cursor_selection.blue.rgb }}",
+            "selectionFg": "{{ .palette.fg.primary }}",
+            "normal": {
+                "black": "{{ .palette.ansi.black }}",
+                "red": "{{ .palette.ansi.red }}",
+                "green": "{{ .palette.ansi.green }}",
+                "yellow": "{{ .palette.ansi.yellow }}",
+                "blue": "{{ .palette.ansi.blue }}",
+                "magenta": "{{ .palette.ansi.magenta }}",
+                "cyan": "{{ .palette.ansi.cyan }}",
+                "white": "{{ .palette.ansi.white }}"
+            },
+            "bright": {
+                "black": "{{ .palette.ansi.bright_black }}",
+                "red": "{{ .palette.ansi.bright_red }}",
+                "green": "{{ .palette.ansi.bright_green }}",
+                "yellow": "{{ .palette.ansi.bright_yellow }}",
+                "blue": "{{ .palette.ansi.bright_blue }}",
+                "magenta": "{{ .palette.ansi.bright_magenta }}",
+                "cyan": "{{ .palette.ansi.bright_cyan }}",
+                "white": "{{ .palette.ansi.bright_white }}"
+            }
+        }
+    }
+}

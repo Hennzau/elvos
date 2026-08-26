@@ -1,0 +1,35 @@
+[theme]
+mode = "light"
+source         = "custom"
+custom_palette = "elvos"
+
+[wallpaper]
+enabled = true
+transition_on_startup = true
+
+[wallpaper.last]
+path = "/usr/share/elvos/wallpaper.jpg"
+
+[wallpaper.monitors.eDP-1]
+path = "/usr/share/elvos/wallpaper.jpg"
+
+[bar.default]
+position = "top"
+
+[idle.behavior.custom]
+timeout = 120
+action = "command"
+command = "noctalia msg session lock && notify-send 'Session locked'"
+
+[hooks]
+started = "noctalia msg panel-toggle launcher"
+
+[nightlight]
+enabled              = false
+force                = false   # hold night temperature, ignoring the schedule
+
+temperature_day   = 6500       # Kelvin (must be > temperature_night by at least 100)
+temperature_night = 4000       # Kelvin
+
+[shell]
+niri_overview_type_to_launch_enabled = true

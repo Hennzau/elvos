@@ -13,3 +13,4 @@ tpm.sh
 live.sh
 .*
 !.zed
+!.chezmoidata
