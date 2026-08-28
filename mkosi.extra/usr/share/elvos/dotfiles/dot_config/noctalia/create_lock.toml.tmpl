@@ -1,0 +1,110 @@
+{{- $output := "eDP-1" -}}
+{{- $w := 1920 -}}
+{{- $h := 1080 -}}
+{{- $cx := div $w 2 -}}
+[lockscreen]
+enabled               = true
+lock_before_suspend   = true
+allow_empty_password  = false
+wallpaper             = "/usr/share/elvos/wallpaper.jpg"
+monitors              = []
+
+blur_intensity        = 0.45
+tint_intensity        = 0.35
+
+[lockscreen_widgets]
+enabled = true
+
+widget_order = [
+    "lockscreen-media",
+    "lockscreen-date",
+    "lockscreen-time",
+    "lockscreen-login-box@{{ $output }}",
+]
+
+[lockscreen_widgets.grid]
+visible        = false
+cell_size      = 16
+major_interval = 4
+
+[lockscreen_widgets.widget.lockscreen-time]
+type       = "clock"
+output     = "{{ $output }}"
+cx         = {{ $cx }}.0
+cy         = {{ div (mul $h 26) 100 }}.0
+box_width  = {{ div (mul $w 42) 100 }}.0
+box_height = {{ div (mul $h 17) 100 }}.0
+rotation   = 0.0
+flip_x     = false
+flip_y     = false
+enabled    = true
+
+[lockscreen_widgets.widget.lockscreen-time.settings]
+clock_style = "digital"
+format      = "%H:%M"
+center_text = true
+circle      = false
+color       = "on_surface"
+shadow      = true
+
+[lockscreen_widgets.widget.lockscreen-date]
+type       = "clock"
+output     = "{{ $output }}"
+cx         = {{ $cx }}.0
+cy         = {{ div (mul $h 38) 100 }}.0
+box_width  = {{ div (mul $w 34) 100 }}.0
+box_height = {{ div (mul $h 5) 100 }}.0
+rotation   = 0.0
+flip_x     = false
+flip_y     = false
+enabled    = true
+
+[lockscreen_widgets.widget.lockscreen-date.settings]
+clock_style = "digital"
+format      = "%A %-d %B"
+center_text = true
+circle      = false
+color       = "on_surface_variant"
+shadow      = false
+
+[lockscreen_widgets.widget."lockscreen-login-box@{{ $output }}"]
+type    = "login_box"
+output  = "{{ $output }}"
+cx      = {{ $cx }}.0
+cy      = {{ div (mul $h 60) 100 }}.0
+enabled = true
+
+[lockscreen_widgets.widget."lockscreen-login-box@{{ $output }}".settings]
+background_color     = "surface"
+background_opacity   = 0.92
+background_radius    = 18
+input_radius         = 10
+input_opacity        = 1.0
+center_password_text = true
+
+show_login_button    = true
+show_unlock_hint     = true
+show_caps_lock       = true
+show_keyboard_layout = true
+show_session_buttons = true
+
+show_media           = false
+show_weather         = false
+
+[lockscreen_widgets.widget.lockscreen-media]
+type       = "media_player"
+output     = "{{ $output }}"
+cx         = {{ $cx }}.0
+cy         = {{ div (mul $h 86) 100 }}.0
+box_width  = {{ div (mul $w 26) 100 }}.0
+box_height = {{ div (mul $h 9) 100 }}.0
+rotation   = 0.0
+flip_x     = false
+flip_y     = false
+enabled    = true
+
+[lockscreen_widgets.widget.lockscreen-media.settings]
+layout             = "horizontal"
+color              = "on_surface"
+shadow             = true
+hide_when_no_media = true

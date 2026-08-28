@@ -17,7 +17,7 @@ path = "/usr/share/elvos/wallpaper.jpg"
 position = "top"
 
 [idle.behavior.custom]
-timeout = 120
+timeout = 180
 action = "command"
 command = "noctalia msg session lock && notify-send 'Session locked'"
 
@@ -26,10 +26,10 @@ started = "noctalia msg panel-toggle launcher"
 
 [nightlight]
 enabled              = false
-force                = false   # hold night temperature, ignoring the schedule
+force                = false
 
-temperature_day   = 6500       # Kelvin (must be > temperature_night by at least 100)
-temperature_night = 4000       # Kelvin
+temperature_day   = 6500
+temperature_night = 4000
 
 [shell]
 niri_overview_type_to_launch_enabled = true

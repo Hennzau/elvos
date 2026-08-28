@@ -1,15 +1,3 @@
-{{/*
-    GTK3 Adwaita overrides — elvOS / One Light, from .chezmoidata/palette.yml.
-
-    Adwaita 3.24 is Sass-compiled down to literal colours, so @define-color
-    alone does NOT recolour widgets the way it does under libadwaita: the
-    explicit rules below are required, not belt-and-braces. They also cover the
-    style contexts other toolkits sample when they read "the GTK theme".
-
-    GTK3's gdk_rgba_parse() REJECTS 8-digit #rrggbbaa (verified), so every
-    translucent value here is composed as rgba(r, g, b, a) from the palette's
-    decimal components. GTK4 has no such limit and uses `.rgba`.
-*/ -}}
 @define-color theme_bg_color {{ .palette.bg.surface }};
 @define-color theme_fg_color {{ .palette.fg.primary }};
 @define-color theme_base_color {{ .palette.bg.editor }};

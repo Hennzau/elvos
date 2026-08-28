@@ -1,37 +1,4 @@
-# =============================================================================
-# elvOS palette — extracted from the "One Light" Zed theme
-# Source: dot_config/zed/themes/create_one.json  ("One Light2")
-#
-# Value convention
-# ----------------
-#   * Opaque colours are plain 6-digit strings: "#rrggbb".
-#     Usable verbatim by every consumer, including the ones with no alpha
-#     support at all (alacritty, QML/noctalia, GTK, fuzzel, mako).
-#
-#   * Translucent colours are mappings, because no single string works
-#     everywhere:
-#
-#         rgba   "#rrggbbaa"  as authored upstream — for Zed
-#         rgb    "#rrggbb"    the same colour composited over its backdrop,
-#                             for consumers that reject alpha
-#         alpha  0.0 - 1.0    the raw alpha, for consumers that take colour
-#                             and opacity separately (QML, GTK rgba())
-#         r g b  0 - 255      decimal channels, for consumers whose only
-#                             translucent syntax is functional rgba(r,g,b,a) —
-#                             GTK3 rejects 8-digit hex outright (GTK4 accepts it)
-#
-#     Unless noted, `rgb` is flattened over bg.editor (#fafafa), which is the
-#     surface these overlays actually land on.
-#
-# So: if a token is a bare string it is safe anywhere; if a template needs
-# `.rgba` or `.rgb` the token is translucent and you must pick deliberately.
-# =============================================================================
-
 palette:
-    # =========================================================================
-    # Backgrounds / Surfaces
-    # =========================================================================
-
     bg:
         canvas: "#dcdcdd"
         surface: "#ebebec"
@@ -54,7 +21,6 @@ palette:
         element_selected: "#cacaca"
         element_disabled: "#ebebec"
 
-        # Ghost elements: same interaction states, no resting fill.
         ghost:
             rgba: "#00000000"
             rgb: "#fafafa"
@@ -77,10 +43,6 @@ palette:
             b: 236
         editor_highlighted_line: "#ebebec"
 
-    # =========================================================================
-    # Foreground / Text
-    # =========================================================================
-
     fg:
         primary: "#242529"
         muted: "#58585a"
@@ -102,20 +64,12 @@ palette:
         comment: "#a2a3a7"
         comment_doc: "#7c7e86"
 
-    # =========================================================================
-    # Icons
-    # =========================================================================
-
     icon:
         primary: "#242529"
         muted: "#58585a"
         placeholder: "#58585a"
         disabled: "#7e8086"
         accent: "#5c78e2"
-
-    # =========================================================================
-    # Borders
-    # =========================================================================
 
     border:
         default: "#c9c9ca"
@@ -131,16 +85,10 @@ palette:
             g: 0
             b: 0
 
-    # =========================================================================
-    # Primary Accent
-    # =========================================================================
-
     accent:
         primary: "#5c78e2"
         secondary: "#7274a7"
 
-        # The elvOS accent gradient: accent.primary -> the purple participant
-        # hue. `_soft` are the same two colours as drop / insert hints.
         gradient_from: "#5c78e2"
         gradient_to: "#984ea5"
         gradient_from_soft:
@@ -171,10 +119,6 @@ palette:
             r: 208
             g: 169
             b: 35
-
-    # =========================================================================
-    # Syntax
-    # =========================================================================
 
     syntax:
         primary: "#242529"
@@ -224,10 +168,6 @@ palette:
         diff_added: "#50a14f"
         diff_removed: "#e45649"
 
-    # =========================================================================
-    # Semantic States
-    # =========================================================================
-
     state:
         error: "#d36151"
         warning: "#a48819"
@@ -244,10 +184,6 @@ palette:
         hidden: "#7e8086"
         ignored: "#7e8086"
         unreachable: "#58585a"
-
-    # =========================================================================
-    # Semantic State Backgrounds
-    # =========================================================================
 
     state_bg:
         error: "#fbdfd9"
@@ -266,10 +202,6 @@ palette:
         renamed: "#e2e2fa"
         unreachable: "#dcdcdd"
 
-    # =========================================================================
-    # Semantic State Borders
-    # =========================================================================
-
     state_border:
         error: "#f6c6bd"
         warning: "#f4e7d1"
@@ -286,10 +218,6 @@ palette:
         modified: "#f4e7d1"
         renamed: "#cbcdf6"
         unreachable: "#c9c9ca"
-
-    # =========================================================================
-    # Terminal ANSI
-    # =========================================================================
 
     ansi:
         black: "#000000"
@@ -323,10 +251,6 @@ palette:
         white: "#bbbbbb"
         bright_white: "#ffffff"
         dim_white: "#888888"
-
-    # =========================================================================
-    # Editor / Interaction overlays
-    # =========================================================================
 
     editor:
         wrap_guide:
@@ -399,14 +323,6 @@ palette:
             g: 0
             b: 0
         scrollbar_track_border: "#eeeeee"
-
-    # =========================================================================
-    # Collaboration / Multi-cursor
-    #
-    # cursor            = caret colour
-    # cursor_bg         = participant chip / avatar ring fill
-    # cursor_selection  = that participant's selected range
-    # =========================================================================
 
     cursor:
         blue: "#5c78e2"
@@ -486,10 +402,6 @@ palette:
             g: 159
             b: 89
 
-    # =========================================================================
-    # Miscellaneous
-    # =========================================================================
-
     misc:
         black: "#000000"
         white: "#ffffff"
@@ -500,14 +412,6 @@ palette:
             r: 0
             g: 0
             b: 0
-
-    # =========================================================================
-    # Version control
-    #
-    # Distinct from the `state` group: upstream One Light gives the git gutter
-    # its own hues, so `state.deleted` (#d36151, == error) and `vcs.deleted`
-    # (#e06c76) are deliberately different colours. Do not merge them.
-    # =========================================================================
 
     vcs:
         added: "#27a657"
@@ -528,14 +432,6 @@ palette:
             r: 248
             g: 81
             b: 73
-
-    # =========================================================================
-    # Shades / shadows
-    #
-    # All derived from fg.primary (#242529) at fixed alphas. One Light defines
-    # no shadow colour of its own (Zed themes have none), so these are the one
-    # deliberately *derived* group in this file rather than extracted.
-    # =========================================================================
 
     shade:
         subtle:

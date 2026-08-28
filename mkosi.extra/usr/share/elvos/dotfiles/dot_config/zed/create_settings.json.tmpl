@@ -36,8 +36,8 @@
         "show": "auto"
     },
 
-    "buffer_font_family": ".ZedMono",
-    "buffer_font_size": 15,
-    "ui_font_family": ".ZedSans",
-    "ui_font_size": 15
+    "buffer_font_family": "{{ .font.mono }}",
+    "buffer_font_size": {{ .font.size.editor }},
+    "ui_font_family": "{{ .font.sans }}",
+    "ui_font_size": {{ .font.size.editor }}
 }

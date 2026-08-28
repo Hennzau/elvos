@@ -1,18 +1,3 @@
-{{/*
-    libadwaita named colours — elvOS / One Light, from .chezmoidata/palette.yml.
-
-    libadwaita 1.9 derives its CSS variables FROM these @define-color names
-    (--window-bg-color: @window_bg_color), so overriding them here propagates
-    to every adwaita widget.
-
-    GTK4's gdk_rgba_parse() accepts 8-digit #rrggbbaa, so shades use `.rgba`
-    directly. The GTK3 sheet next door cannot, and uses `.r/.g/.b/.alpha`.
-
-    Surface hierarchy mirrors One Light's own:
-      bg.editor  #fafafa  lightest — views, cards, popovers
-      bg.surface #ebebec  mid      — window chrome, sidebars
-      bg.canvas  #dcdcdd  darkest  — headerbars, overview
-*/ -}}
 @define-color window_bg_color {{ .palette.bg.surface }};
 @define-color window_fg_color {{ .palette.fg.primary }};
 

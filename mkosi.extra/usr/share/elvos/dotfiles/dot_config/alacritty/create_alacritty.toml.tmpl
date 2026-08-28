@@ -10,11 +10,11 @@ dynamic_padding = true
 opacity = 1.0
 
 [font]
-size = 11.0
-normal = { family = "Zed Mono", style = "Regular" }
-bold = { family = "Zed Mono", style = "Bold" }
-italic = { family = "Zed Mono", style = "Italic" }
-bold_italic = { family = "Zed Mono", style = "Bold Italic" }
+size = {{ .font.size.terminal }}.0
+normal = { family = "{{ .font.mono }}", style = "Regular" }
+bold = { family = "{{ .font.mono }}", style = "Bold" }
+italic = { family = "{{ .font.mono }}", style = "Italic" }
+bold_italic = { family = "{{ .font.mono }}", style = "Bold Italic" }
 
 [cursor]
 style = { shape = "Beam", blinking = "On" }
@@ -35,14 +35,6 @@ chars = "\u001B\r"
 key = "Back"
 mods = "Control"
 chars = "\u0017"
-
-
-# =============================================================================
-# Colors — One Light
-#
-# alacritty parses only 6-digit hex; any palette token that carries alpha must
-# be referenced through its `.rgb` attribute (pre-composited over bg.editor).
-# =============================================================================
 
 [colors.primary]
 background = '{{ .palette.bg.terminal }}'
@@ -90,11 +82,6 @@ background = '{{ .palette.accent.active_match.rgb }}'
 foreground = '{{ .palette.fg.primary }}'
 background = '{{ .palette.accent.hover.rgb }}'
 
-
-# =============================================================================
-# ANSI — normal
-# =============================================================================
-
 [colors.normal]
 black = '{{ .palette.ansi.black }}'
 red = '{{ .palette.ansi.red }}'
@@ -105,11 +92,6 @@ magenta = '{{ .palette.ansi.magenta }}'
 cyan = '{{ .palette.ansi.cyan }}'
 white = '{{ .palette.ansi.white }}'
 
-
-# =============================================================================
-# ANSI — bright
-# =============================================================================
-
 [colors.bright]
 black = '{{ .palette.ansi.bright_black }}'
 red = '{{ .palette.ansi.bright_red }}'
@@ -119,11 +101,6 @@ blue = '{{ .palette.ansi.bright_blue }}'
 magenta = '{{ .palette.ansi.bright_magenta }}'
 cyan = '{{ .palette.ansi.bright_cyan }}'
 white = '{{ .palette.ansi.bright_white }}'
-
-
-# =============================================================================
-# ANSI — dim
-# =============================================================================
 
 [colors.dim]
 black = '{{ .palette.ansi.dim_black }}'

@@ -1,0 +1,11 @@
+font:
+    mono: "Lilex Nerd Font Mono"
+    mono_ui: "Lilex Nerd Font"
+    sans: "IBM Plex Sans"
+    serif: "IBM Plex Serif"
+    emoji: "Noto Color Emoji"
+
+    size:
+        ui: 11
+        terminal: 11
+        editor: 15

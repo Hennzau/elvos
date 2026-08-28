@@ -105,8 +105,9 @@ binds {
 
     Mod+D { spawn-sh "noctalia msg panel-toggle launcher"; }
     Mod+S { spawn-sh "noctalia msg panel-toggle control-center"; }
-    Mod+P { spawn-sh "noctalia msg session lock"; }
     Mod+I { spawn-sh "noctalia msg session lock-and-suspend"; }
+    Mod+P { spawn-sh "noctalia msg session lock"; }
+    Mod+Shift+P { power-off-monitors; }
 
     XF86AudioRaiseVolume { spawn-sh "noctalia msg volume-up"; }
     XF86AudioLowerVolume { spawn-sh "noctalia msg volume-down"; }
@@ -153,7 +154,6 @@ binds {
     Mod+Shift+A { close-window; }
     Mod+Return { spawn "alacritty"; }
     Mod+Shift+E { quit; }
-    Mod+Shift+P { power-off-monitors; }
 
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
