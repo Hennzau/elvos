@@ -25,6 +25,7 @@ systemctl --root="$BUILDROOT" enable "${units[@]}"
 user_units=(
         elvos-dotfiles.service
         ssh-agent.socket
+        udiskie.service
 )
 
 systemctl --root="$BUILDROOT" --global enable "${user_units[@]}"

@@ -71,20 +71,20 @@ def "elvos version" [] {
     | parse --regex '^(?<key>[A-Z0-9_]+)="?(?<value>.*?)"?$'
 }
 
-const elvos_dotfiles = "/usr/share/elvos/dotfiles"
-
 def "elvos config list" [] {
-    chezmoi managed --source $elvos_dotfiles --include files
+    chezmoi managed --include files
 }
 
 def "elvos config apply" [] {
-    chezmoi apply --force --no-tty --source $elvos_dotfiles
+    chezmoi apply --force --no-tty
 }
 
 def "elvos config reset" [] {
     elvos config list
     | lines
-    | each { |it| $env.HOME | path join $it } | each { |it| rm $it }
+    | each { |it| $env.HOME | path join $it }
+    | where { |it| not ($it | str ends-with "chezmoi.toml") }
+    | each { |it| rm $it }
 
     elvos config apply
 }

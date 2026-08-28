@@ -1,38 +1,24 @@
 {
   "policies": {
+    "AIControls": {
+      "Default": {
+        "Value": "blocked",
+        "Locked": true
+      }
+    },
+    "AutofillAddressEnabled": false,
+    "AutofillCreditCardEnabled": false,
     "DisableAppUpdate": true,
-    "DisableTelemetry": true,
     "DisableFirefoxStudies": true,
+    "DisableFormHistory": true,
     "DisablePocket": true,
+    "DisableTelemetry": true,
+    "DisplayBookmarksToolbar": "never",
     "DontCheckDefaultBrowser": true,
-    "OverrideFirstRunPage": "",
-    "OverridePostUpdatePage": "",
     "EnableTrackingProtection": {
       "Value": true,
       "Cryptomining": true,
       "Fingerprinting": true,
-      "Locked": false
-    },
-    "FirefoxHome": {
-      "Search": false,
-      "TopSites": false,
-      "SponsoredTopSites": false,
-      "Highlights": false,
-      "Pocket": false,
-      "Stories": false,
-      "SponsoredPocket": false,
-      "SponsoredStories": false,
-      "Snippets": false,
-      "Weather": false,
-      "Locked": false
-    },
-    "UserMessaging": {
-      "WhatsNew": false,
-      "ExtensionRecommendations": false,
-      "FeatureRecommendations": false,
-      "UrlbarInterventions": false,
-      "SkipOnboarding": true,
-      "MoreFromMozilla": false,
       "Locked": false
     },
     "ExtensionSettings": {
@@ -52,17 +38,63 @@
         "default_area": "navbar"
       }
     },
+    "FirefoxHome": {
+      "Search": false,
+      "TopSites": false,
+      "SponsoredTopSites": false,
+      "Highlights": false,
+      "Pocket": false,
+      "Stories": false,
+      "SponsoredPocket": false,
+      "SponsoredStories": false,
+      "Snippets": false,
+      "Weather": false,
+      "Locked": false
+    },
+    "FirefoxSuggest": {
+      "WebSuggestions": false,
+      "SponsoredSuggestions": false,
+      "ImproveSuggest": false,
+      "Locked": true
+    },
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+    "PDFjs": {
+      "Enabled": true
+    },
+    "PasswordManagerEnabled": false,
     "Permissions": {
       "Notifications": {
         "BlockNewRequests": true,
         "Locked": false
       }
     },
-    "PDFjs": {
-      "Enabled": true
+    "Preferences": {
+      "browser.urlbar.suggest.history": {
+        "Value": false,
+        "Status": "default"
+      },
+      "browser.urlbar.suggest.topsites": {
+        "Value": false,
+        "Status": "default"
+      },
+      "browser.urlbar.suggest.recentsearches": {
+        "Value": false,
+        "Status": "default"
+      },
+      "browser.newtabpage.activity-stream.newtabWallpapers.enabled": {
+        "Value": false,
+        "Status": "default"
+      },
+      "browser.newtabpage.activity-stream.logowordmark.alwaysVisible": {
+        "Value": false,
+        "Status": "default"
+      },
+      "browser.newtabpage.activity-stream.discoverystream.promoCard.visible": {
+        "Value": false,
+        "Status": "default"
+      }
     },
-    "DisplayBookmarksToolbar": "never",
-    "DisableFormHistory": true,
     "SearchEngines": {
       "Default": "DuckDuckGo",
       "Remove": [
@@ -132,31 +164,14 @@
         }
       ]
     },
-    "Preferences": {
-      "browser.urlbar.suggest.history": {
-        "Value": false,
-        "Status": "default"
-      },
-      "browser.urlbar.suggest.topsites": {
-        "Value": false,
-        "Status": "default"
-      },
-      "browser.urlbar.suggest.recentsearches": {
-        "Value": false,
-        "Status": "default"
-      },
-      "browser.newtabpage.activity-stream.newtabWallpapers.enabled": {
-        "Value": false,
-        "Status": "default"
-      },
-      "browser.newtabpage.activity-stream.logowordmark.alwaysVisible": {
-        "Value": false,
-        "Status": "default"
-      },
-      "browser.newtabpage.activity-stream.discoverystream.promoCard.visible": {
-        "Value": false,
-        "Status": "default"
-      }
+    "UserMessaging": {
+      "WhatsNew": false,
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "UrlbarInterventions": false,
+      "SkipOnboarding": true,
+      "MoreFromMozilla": false,
+      "Locked": false
     }
   }
 }
