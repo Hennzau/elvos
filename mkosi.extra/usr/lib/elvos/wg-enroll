@@ -78,12 +78,6 @@ sed -e "s|@PEER_PUBKEY@|${peer_key}|" \
     /usr/share/elvos/wireguard/wg0.netdev.in >"/etc/systemd/network/${netdev}.netdev"
 
 chmod 0644 "/etc/systemd/network/${netdev}".{netdev,network}
-# A restart, not `networkctl reload`. Credentials are materialised into
-# /run/credentials/<unit>/ when the unit STARTS, and ImportCredential= is
-# evaluated only at that point. A reload re-reads .netdev/.network files but
-# would still look for the key in a credential directory populated before this
-# script created it, and networkd would report "No private key specified and
-# default key isn't available".
 systemctl restart systemd-networkd
 
 cat <<MSG

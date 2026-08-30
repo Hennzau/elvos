@@ -1,4 +1,11 @@
 input {
+    // The firmware asserts the power-button GPIO on every s2idle wake. niri
+    // takes over the power key by default and suspends on it, so that phantom
+    // press re-suspends the machine immediately -> suspend/resume storm that
+    // wedges amdgpu's VPE block. Let logind own the power key instead.
+    // https://github.com/niri-wm/niri/issues/2233
+    disable-power-key-handling
+
     keyboard { xkb { layout "fr"; }; }
 
     touchpad {
@@ -11,6 +18,10 @@ input {
     }
 
     mouse { accel-profile "flat"; }
+}
+
+output "eDP-1" {
+    mode "2880x1800@120.000"
 }
 
 layout {
