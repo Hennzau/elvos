@@ -88,3 +88,43 @@ def "elvos config reset" [] {
 
     elvos config apply
 }
+
+def "elvos vpn enroll" [config: path] {
+    let file = ($config | path expand)
+
+    if not ($file | path exists) {
+        error make { msg: $"no such config file: ($file)" }
+    }
+
+    run0 /usr/lib/elvos/wg-enroll $file
+}
+
+def "elvos vpn up" [] {
+    run0 networkctl up wg0
+}
+
+def "elvos vpn down" [] {
+    run0 networkctl down wg0
+}
+
+def "elvos vpn status" [--full] {
+    if not ("/sys/class/net/wg0" | path exists) {
+        print "wg0 does not exist - not enrolled, or systemd-networkd needs a restart"
+        return
+    }
+
+    if $full {
+        run0 wg show wg0
+    } else {
+        networkctl status wg0
+    }
+}
+
+def "elvos vpn ip" [] {
+    let probe = {|flag|
+        let out = (do --ignore-errors { ^curl $flag -s --max-time 10 https://ifconfig.co } | default "" | str trim)
+        if ($out | is-empty) { "unreachable" } else { $out }
+    }
+
+    { v4: (do $probe "-4"), v6: (do $probe "-6") }
+}

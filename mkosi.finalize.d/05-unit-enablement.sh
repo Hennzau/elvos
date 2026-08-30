@@ -13,6 +13,7 @@ units=(
         keyd.service
 
         iwd.service
+        nftables.service
         systemd-networkd.service
         systemd-resolved.service
         systemd-timesyncd.service

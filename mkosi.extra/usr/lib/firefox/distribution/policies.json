@@ -8,6 +8,10 @@
     },
     "AutofillAddressEnabled": false,
     "AutofillCreditCardEnabled": false,
+    "DNSOverHTTPS": {
+      "Enabled": false,
+      "Locked": true
+    },
     "DisableAppUpdate": true,
     "DisableFirefoxStudies": true,
     "DisableFormHistory": true,
@@ -96,8 +100,9 @@
       }
     },
     "SearchEngines": {
-      "Default": "DuckDuckGo",
+      "Default": "DuckDuckGo Safe",
       "Remove": [
+        "DuckDuckGo",
         "Google",
         "Bing",
         "eBay",
@@ -106,6 +111,15 @@
         "YouTube"
       ],
       "Add": [
+        {
+          "Name": "DuckDuckGo Safe",
+          "URLTemplate": "https://safe.duckduckgo.com/?q={searchTerms}",
+          "SuggestURLTemplate": "https://safe.duckduckgo.com/ac/?q={searchTerms}&type=list",
+          "Method": "GET",
+          "Alias": "@ddg",
+          "Description": "DuckDuckGo (safe-search host, matches AdGuard Family DNS)",
+          "IconURL": "https://duckduckgo.com/favicon.ico"
+        },
         {
           "Name": "Arch Packages",
           "URLTemplate": "https://archlinux.org/packages/?q={searchTerms}",

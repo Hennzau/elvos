@@ -1,0 +1,101 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+netdev=50-wg0
+config= use_peer_dns=no activation=up
+
+while [[ $# -gt 0 ]]; do
+        case $1 in
+        --use-peer-dns) use_peer_dns=yes; shift ;;
+        --manual)       activation=manual; shift ;;
+        -h|--help) sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -*) echo "${0##*/}: unknown option: $1" >&2; exit 2 ;;
+        *)  config=$1; shift ;;
+        esac
+done
+
+[[ -n $config ]] || { echo "${0##*/}: need a wg-quick config file" >&2; exit 2; }
+[[ -r $config ]] || { echo "${0##*/}: cannot read $config" >&2; exit 1; }
+[[ $EUID -eq 0 ]] || { echo "${0##*/}: must run as root" >&2; exit 1; }
+
+parse() {
+        awk -F= '
+                /^[[:space:]]*[#;]/ { next }
+                /^[[:space:]]*\[/   { gsub(/[][[:space:]]/, "", $0); section = $0; next }
+                NF < 2              { next }
+                {
+                        key = $1; sub(/[[:space:]]+$/, "", key); gsub(/^[[:space:]]+/, "", key)
+                        val = substr($0, index($0, "=") + 1)
+                        gsub(/^[[:space:]]+|[[:space:]]+$/, "", val)
+                        if (val != "") print section "." key "=" val
+                }
+        ' "$1"
+}
+
+get() { parse "$config" | awk -F= -v k="$1" '$1 == k { sub(/^[^=]*=/, ""); print; exit }'; }
+
+private_key=$(get Interface.PrivateKey)
+addresses=$(get Interface.Address)
+peer_dns=$(get Interface.DNS)
+peer_key=$(get Peer.PublicKey)
+endpoint=$(get Peer.Endpoint)
+allowed_ips=$(get Peer.AllowedIPs)
+keepalive=$(get Peer.PersistentKeepalive)
+
+for v in private_key addresses peer_key endpoint allowed_ips; do
+        [[ -n ${!v} ]] || { echo "${0##*/}: $config has no ${v//_/ }" >&2; exit 1; }
+done
+: "${keepalive:=25}"
+
+umask 077
+tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+printf '%s' "$private_key" >"$tmp/private"
+
+mkdir -p /etc/credstore.encrypted
+systemd-creds encrypt --name="network.wireguard.private.${netdev}" \
+        --with-key=auto "$tmp/private" \
+        "/etc/credstore.encrypted/network.wireguard.private.${netdev}"
+chmod 0600 "/etc/credstore.encrypted/network.wireguard.private.${netdev}"
+
+address_block=$(printf '%s' "$addresses" | tr ',' '\n' \
+        | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed '/^$/d;s/^/Address=/')
+if [[ $use_peer_dns == yes && -n $peer_dns ]]; then
+        address_block+=$'\n\n''# --use-peer-dns: overrides the filtering resolver while the tunnel is up.'
+        address_block+=$'\n'"DNS=${peer_dns//,/ }"
+        address_block+=$'\n''Domains=~.'
+fi
+
+mkdir -p /etc/systemd/network
+awk -v repl="$address_block" '{ if ($0 == "@ADDRESSES@") print repl; else print }' \
+        /usr/share/elvos/wireguard/wg0.network.in \
+        | sed -e "s|@ACTIVATION@|${activation}|" >"/etc/systemd/network/${netdev}.network"
+
+sed -e "s|@PEER_PUBKEY@|${peer_key}|" \
+    -e "s|@PEER_ENDPOINT@|${endpoint}|" \
+    -e "s|@ALLOWED_IPS@|${allowed_ips}|" \
+    -e "s|@KEEPALIVE@|${keepalive}|" \
+    /usr/share/elvos/wireguard/wg0.netdev.in >"/etc/systemd/network/${netdev}.netdev"
+
+chmod 0644 "/etc/systemd/network/${netdev}".{netdev,network}
+# A restart, not `networkctl reload`. Credentials are materialised into
+# /run/credentials/<unit>/ when the unit STARTS, and ImportCredential= is
+# evaluated only at that point. A reload re-reads .netdev/.network files but
+# would still look for the key in a credential directory populated before this
+# script created it, and networkd would report "No private key specified and
+# default key isn't available".
+systemctl restart systemd-networkd
+
+cat <<MSG
+Enrolled from: ${config}
+  endpoint   : ${endpoint}
+  addresses  : ${addresses}
+  DNS        : $( [[ $use_peer_dns == yes ]] && echo "${peer_dns} (from peer)" || echo "system filtering resolver (peer DNS ignored)" )
+  connect    : $( [[ $activation == up ]] && echo "automatically at every boot" || echo "manually (--manual)" )
+
+Connect with:  networkctl up wg0
+Disconnect  :  networkctl down wg0
+
+The config file still contains the private key - delete it:
+  shred -u ${config}
+MSG

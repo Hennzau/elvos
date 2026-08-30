@@ -1,0 +1,15 @@
+[NetDev]
+Name=wg0
+Kind=wireguard
+Description=elvOS WireGuard tunnel
+
+[WireGuard]
+FirewallMark=0xca6c
+
+[WireGuardPeer]
+PublicKey=@PEER_PUBKEY@
+Endpoint=@PEER_ENDPOINT@
+AllowedIPs=@ALLOWED_IPS@
+PersistentKeepalive=@KEEPALIVE@
+
+RouteTable=51820
