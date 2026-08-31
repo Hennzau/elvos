@@ -7,10 +7,7 @@ custom_palette = "elvos"
 enabled = true
 transition_on_startup = true
 
-[wallpaper.last]
-path = "/usr/share/elvos/wallpaper.jpg"
-
-[wallpaper.monitors.eDP-1]
+[wallpaper.default]
 path = "/usr/share/elvos/wallpaper.jpg"
 
 [bar.default]

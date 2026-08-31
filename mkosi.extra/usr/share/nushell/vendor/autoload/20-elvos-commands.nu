@@ -128,3 +128,107 @@ def "elvos vpn ip" [] {
 
     { v4: (do $probe "-4"), v6: (do $probe "-6") }
 }
+
+def elvos-portal-resolver [device: string]: nothing -> string {
+    let gateways = (
+        ip -json route show default dev $device
+        | from json
+        | get gateway?
+        | compact
+    )
+
+    if ($gateways | is-empty) {
+        error make { msg: $"no default gateway on ($device) - join the network first" }
+    }
+
+    $gateways | first
+}
+
+def "elvos portal probe" [] {
+    let device = (elvos-wifi-device)
+    let gateway = (elvos-portal-resolver $device)
+
+    let http = {|url|
+        let r = (^curl -s -m 8 --interface $device -o /dev/null -w '%{http_code}\t%{redirect_url}' $url | complete)
+
+        if $r.exit_code != 0 {
+            { code: (if $r.exit_code == 28 { "timeout" } else { "unreachable" }), redirect: "" }
+        } else {
+            let parts = ($r.stdout | str trim | split row "\t")
+            { code: ($parts | get 0), redirect: ($parts | get 1? | default "") }
+        }
+    }
+
+    let gw = (do $http $"http://($gateway)/")
+    let net = (do $http "http://connectivitycheck.gstatic.com/generate_204")
+
+    let intercepted = (($gw.code | str starts-with "3") and ($gw.redirect | is-not-empty))
+
+    {
+        device: $device
+        gateway: $gateway
+
+        advertised_portal: (
+            do --ignore-errors {
+                networkctl status $device --json=short | from json | get CaptivePortal?
+            }
+        )
+        link_dns: (resolvectl dns $device | str trim)
+        global_dns: (
+            resolvectl status
+            | lines
+            | take until {|l| $l | str starts-with "Link " }
+            | where {|l| $l =~ "DNS Servers:" }
+            | str join " "
+            | str trim
+        )
+        generate_204: $net.code
+        gateway_http: $gw.code
+        portal_host: (if $intercepted { $gw.redirect | url parse | get host } else { null })
+        login_url: (if $intercepted { $"http://($gateway)/" } else { null })
+        verdict: (
+            if $intercepted {
+                "captive portal - run `elvos portal login`"
+            } else if ($net.code == "204") {
+                "open - nothing is intercepting; no login needed"
+            } else {
+                "blocked, and the gateway offers no redirect - not an HTTP portal"
+            }
+        )
+    }
+}
+
+def "elvos portal login" [] {
+    let probe = (elvos portal probe)
+
+    if ($probe.login_url | is-empty) {
+        print $"no captive portal detected: ($probe.verdict)"
+        return
+    }
+
+    print $"opening ($probe.login_url) -> ($probe.portal_host)"
+    ^setsid --fork xdg-open $probe.login_url
+}
+
+def "elvos portal up" [resolver?: string] {
+    let device = (elvos-wifi-device)
+
+    if $resolver == null {
+        run0 /usr/lib/elvos/portal-mode up $device
+    } else {
+        run0 /usr/lib/elvos/portal-mode up $device $resolver
+    }
+
+    print $"portal mode on: ($device) resolvers widened to ~., AdGuard parked, wg0 down."
+    elvos portal login
+}
+
+def "elvos portal down" [] {
+    run0 /usr/lib/elvos/portal-mode down (elvos-wifi-device)
+
+    print "portal mode off: AdGuard over TLS and wg0 restored."
+}
+
+def "elvos portal status" [] {
+    resolvectl status (elvos-wifi-device)
+}
