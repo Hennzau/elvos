@@ -1,0 +1,3 @@
+#!/bin/bash
+# Pick an output to mirror and where to show it.
+exec quickshell -p /usr/share/elvos/quickshell/mirror.qml "$@"

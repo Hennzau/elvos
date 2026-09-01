@@ -1,0 +1,6 @@
+#!/bin/bash
+set -eu
+
+quickshell -p /usr/share/elvos/quickshell/login.qml "$@"
+
+exec niri msg action quit --skip-confirmation

@@ -89,146 +89,73 @@ def "elvos config reset" [] {
     elvos config apply
 }
 
-def "elvos vpn enroll" [config: path] {
+# Enrolment, not a toggle: this writes the wg0 netdev and network files once
+# from a wg-quick config. `elvos security on` is what uses them afterwards.
+def "elvos security install" [
+    config: path                # wg-quick config to enrol
+    --manual                    # do not bring wg0 up automatically at boot
+    --use-peer-dns              # take DNS from the peer instead of AdGuard
+] {
     let file = ($config | path expand)
 
     if not ($file | path exists) {
         error make { msg: $"no such config file: ($file)" }
     }
 
-    run0 /usr/lib/elvos/wg-enroll $file
+    mut args = [$file]
+    if $manual { $args = ($args | prepend "--manual") }
+    if $use_peer_dns { $args = ($args | prepend "--use-peer-dns") }
+
+    run0 /usr/lib/elvos/wg-enroll ...$args
+
+    print "enrolled. `elvos security on` brings the tunnel up."
 }
 
-def "elvos vpn up" [] {
-    run0 networkctl up wg0
+# One switch, not two. The tunnel and the encrypted resolver only make sense
+# together: a captive portal needs both out of the way, and leaving either on
+# silently breaks the other - AdGuard stalls on a blocked port 853, and wg0
+# black-holes anything that is not on-link.
+def "elvos security on" [] {
+    run0 /usr/lib/elvos/security on
+
+    print "security on: WireGuard up, AdGuard over TLS."
 }
 
-def "elvos vpn down" [] {
-    run0 networkctl down wg0
+def "elvos security off" [] {
+    run0 /usr/lib/elvos/security off
+
+    print "security off: WireGuard down, plain DNS from the network."
+    print "run `elvos security on` when you are through the portal."
 }
 
-def "elvos vpn status" [--full] {
-    if not ("/sys/class/net/wg0" | path exists) {
-        print "wg0 does not exist - not enrolled, or systemd-networkd needs a restart"
-        return
-    }
-
-    if $full {
-        run0 wg show wg0
-    } else {
-        networkctl status wg0
-    }
-}
-
-def "elvos vpn ip" [] {
-    let probe = {|flag|
-        let out = (do --ignore-errors { ^curl $flag -s --max-time 10 https://ifconfig.co } | default "" | str trim)
-        if ($out | is-empty) { "unreachable" } else { $out }
-    }
-
-    { v4: (do $probe "-4"), v6: (do $probe "-6") }
-}
-
-def elvos-portal-resolver [device: string]: nothing -> string {
-    let gateways = (
-        ip -json route show default dev $device
-        | from json
-        | get gateway?
-        | compact
+def "elvos security status" [] {
+    let tunnel = (
+        if ("/sys/class/net/wg0" | path exists) {
+            if ((open --raw /sys/class/net/wg0/operstate | str trim) == "down") { "down" } else { "up" }
+        } else {
+            "not enrolled"
+        }
     )
 
-    if ($gateways | is-empty) {
-        error make { msg: $"no default gateway on ($device) - join the network first" }
-    }
+    # Empty means the global AdGuard scope is parked - that is `off`.
+    let global = (
+        resolvectl status
+        | lines
+        | take until {|l| $l | str starts-with "Link " }
+        | where {|l| $l =~ "DNS Servers:" }
+        | str join " "
+        | str trim
+    )
 
-    $gateways | first
-}
-
-def "elvos portal probe" [] {
-    let device = (elvos-wifi-device)
-    let gateway = (elvos-portal-resolver $device)
-
-    let http = {|url|
-        let r = (^curl -s -m 8 --interface $device -o /dev/null -w '%{http_code}\t%{redirect_url}' $url | complete)
-
-        if $r.exit_code != 0 {
-            { code: (if $r.exit_code == 28 { "timeout" } else { "unreachable" }), redirect: "" }
-        } else {
-            let parts = ($r.stdout | str trim | split row "\t")
-            { code: ($parts | get 0), redirect: ($parts | get 1? | default "") }
-        }
-    }
-
-    let gw = (do $http $"http://($gateway)/")
-    let net = (do $http "http://connectivitycheck.gstatic.com/generate_204")
-
-    let intercepted = (($gw.code | str starts-with "3") and ($gw.redirect | is-not-empty))
+    let egress = (
+        let out = (do --ignore-errors { ^curl -4 -s --max-time 8 https://ifconfig.co } | default "" | str trim);
+        if ($out | is-empty) { "unreachable" } else { $out }
+    )
 
     {
-        device: $device
-        gateway: $gateway
-
-        advertised_portal: (
-            do --ignore-errors {
-                networkctl status $device --json=short | from json | get CaptivePortal?
-            }
-        )
-        link_dns: (resolvectl dns $device | str trim)
-        global_dns: (
-            resolvectl status
-            | lines
-            | take until {|l| $l | str starts-with "Link " }
-            | where {|l| $l =~ "DNS Servers:" }
-            | str join " "
-            | str trim
-        )
-        generate_204: $net.code
-        gateway_http: $gw.code
-        portal_host: (if $intercepted { $gw.redirect | url parse | get host } else { null })
-        login_url: (if $intercepted { $"http://($gateway)/" } else { null })
-        verdict: (
-            if $intercepted {
-                "captive portal - run `elvos portal login`"
-            } else if ($net.code == "204") {
-                "open - nothing is intercepting; no login needed"
-            } else {
-                "blocked, and the gateway offers no redirect - not an HTTP portal"
-            }
-        )
+        state: (if ($global | is-empty) { "off" } else { "on" })
+        tunnel: $tunnel
+        global_dns: (if ($global | is-empty) { "parked" } else { $global })
+        egress_ip: $egress
     }
-}
-
-def "elvos portal login" [] {
-    let probe = (elvos portal probe)
-
-    if ($probe.login_url | is-empty) {
-        print $"no captive portal detected: ($probe.verdict)"
-        return
-    }
-
-    print $"opening ($probe.login_url) -> ($probe.portal_host)"
-    ^setsid --fork xdg-open $probe.login_url
-}
-
-def "elvos portal up" [resolver?: string] {
-    let device = (elvos-wifi-device)
-
-    if $resolver == null {
-        run0 /usr/lib/elvos/portal-mode up $device
-    } else {
-        run0 /usr/lib/elvos/portal-mode up $device $resolver
-    }
-
-    print $"portal mode on: ($device) resolvers widened to ~., AdGuard parked, wg0 down."
-    elvos portal login
-}
-
-def "elvos portal down" [] {
-    run0 /usr/lib/elvos/portal-mode down (elvos-wifi-device)
-
-    print "portal mode off: AdGuard over TLS and wg0 restored."
-}
-
-def "elvos portal status" [] {
-    resolvectl status (elvos-wifi-device)
 }

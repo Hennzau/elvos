@@ -8,7 +8,7 @@ units=(
         systemd-userdbd.socket
         elvos-subid.service
 
-        gdm.service
+        greetd.service
         power-profiles-daemon.service
         keyd.service
 

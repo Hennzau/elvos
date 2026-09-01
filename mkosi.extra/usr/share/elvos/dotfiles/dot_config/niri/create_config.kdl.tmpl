@@ -24,6 +24,10 @@ output "eDP-1" {
     mode "2880x1800@120.000"
 }
 
+output "HDMI-A-1" {
+    mode "2560x1440@144.000"
+}
+
 layout {
     gaps 12
 
@@ -101,30 +105,34 @@ screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 hotkey-overlay { skip-at-startup; }
 
-spawn-at-startup "noctalia"
+spawn-at-startup "elvos-background"
+spawn-at-startup "elvos-shell"
+spawn-at-startup "mako"
 debug { honor-xdg-activation-with-invalid-serial; }
 
-window-rule { match app-id="dev.noctalia.Noctalia"; open-floating true; default-column-width { fixed 1080; }; default-window-height { fixed 920; }; }
+window-rule { match title="^elvOS Mirror$"; open-floating true; open-focused true; geometry-corner-radius 12; clip-to-geometry true; }
+
 window-rule { geometry-corner-radius 10; clip-to-geometry true; min-width 300; min-height 300; }
 window-rule { match app-id=r#"firefox$"# title="^Picture-in-Picture$"; open-floating true; }
 window-rule { match app-id=r#"Alacritty$"#; default-column-width { proportion 0.5; }; }
+window-rule { match app-id=r#"Zed$"#; default-column-width { proportion 1.0; }; }
 
-layer-rule { match namespace="^noctalia-wallpaper"; place-within-backdrop true; }
+layer-rule { match namespace="^elvos-background$"; place-within-backdrop true; }
 
 binds {
     Mod+Shift+D { show-hotkey-overlay; }
 
-    Mod+D { spawn-sh "noctalia msg panel-toggle launcher"; }
-    Mod+S { spawn-sh "noctalia msg panel-toggle control-center"; }
-    Mod+I { spawn-sh "noctalia msg session lock-and-suspend"; }
-    Mod+P { spawn-sh "noctalia msg session lock"; }
+    Mod+D { spawn "fuzzel"; }
+    Mod+I { spawn-sh "elvos-lock & sleep 0.3; systemctl suspend"; }
+    Mod+P { spawn "elvos-lock"; }
+    Mod+N { spawn "elvos-mirror"; }
     Mod+Shift+P { power-off-monitors; }
 
-    XF86AudioRaiseVolume { spawn-sh "noctalia msg volume-up"; }
-    XF86AudioLowerVolume { spawn-sh "noctalia msg volume-down"; }
-    XF86AudioMute { spawn-sh "noctalia msg volume-mute"; }
-    XF86MonBrightnessUp { spawn-sh "noctalia msg brightness-up"; }
-    XF86MonBrightnessDown { spawn-sh "noctalia msg brightness-down"; }
+    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86MonBrightnessUp { spawn "brightnessctl" "set" "5%+"; }
+    XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
 
     Mod+Left  { focus-column-or-monitor-left; }
     Mod+Down  { focus-window-or-workspace-down; }
@@ -171,4 +179,4 @@ binds {
     Alt+Print { screenshot-window; }
 }
 
-switch-events { lid-close { spawn "noctalia" "msg" "session" "lock-and-suspend"; }; }
+switch-events { lid-close { spawn "sh" "-c" "elvos-lock & sleep 0.3; systemctl suspend"; }; }

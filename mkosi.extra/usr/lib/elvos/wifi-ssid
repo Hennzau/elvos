@@ -1,0 +1,9 @@
+#!/bin/bash
+set -eu
+
+for wireless in /sys/class/net/*/wireless; do
+        [[ -e $wireless ]] || continue
+        dev=$(basename "$(dirname "$wireless")")
+        iw dev "$dev" link 2>/dev/null |
+                awk '/^[[:space:]]*SSID: /{ sub(/^[[:space:]]*SSID: /, ""); print; exit }'
+done

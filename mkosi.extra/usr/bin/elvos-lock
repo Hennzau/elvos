@@ -1,0 +1,9 @@
+#!/bin/bash
+# Locks the session and prompts for the password. ext-session-lock keeps the
+# screen locked if this dies, so a crash fails closed rather than open.
+#
+# flock -n so a second lock cannot stack on the first: the idle timer and a
+# manual Mod+P can easily fire together, and two lock surfaces leave one of
+# them holding the keyboard with nothing to type into.
+exec flock -n "${XDG_RUNTIME_DIR:-/tmp}/elvos-lock.lock" \
+        quickshell -p /usr/share/elvos/quickshell/lock.qml "$@"

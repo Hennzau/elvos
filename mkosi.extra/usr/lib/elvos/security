@@ -1,0 +1,57 @@
+#!/bin/bash
+set -eu -o pipefail
+
+dropin=/run/systemd/resolved.conf.d/90-elvos-security.conf
+
+usage() {
+        echo "usage: ${0##*/} on|off" >&2
+        exit 2
+}
+
+links() {
+        local path dev
+        for path in /sys/class/net/*/device; do
+                [[ -e $path ]] || continue
+                dev=$(basename "$(dirname "$path")")
+                echo "$dev"
+        done
+}
+
+case ${1-} in
+on)
+        rm -f "$dropin"
+        systemctl reload systemd-resolved
+
+        for dev in $(links); do
+                resolvectl revert "$dev" || true
+        done
+
+        resolvectl flush-caches
+        networkctl up wg0 || true
+        ;;
+off)
+        networkctl down wg0 || true
+
+        mkdir -p "${dropin%/*}"
+        cat >"$dropin" <<-'EOF'
+	[Resolve]
+	DNS=
+	Domains=
+	DNSOverTLS=no
+	DNSSEC=no
+	EOF
+        systemctl reload systemd-resolved
+
+        for dev in $(links); do
+                resolvectl dnsovertls "$dev" no || true
+                resolvectl dnssec "$dev" no || true
+                resolvectl domain "$dev" '~.' || true
+                resolvectl default-route "$dev" yes || true
+        done
+
+        resolvectl flush-caches
+        ;;
+*)
+        usage
+        ;;
+esac

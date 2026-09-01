@@ -1,0 +1,18 @@
+# greetd starts elvos-login, which brings up niri with the quickshell greeter
+# inside it. On success the greeter execs the user's session, niri exits with
+# it, and greetd hands over.
+#
+# vt1, which is what greetd.service is built for: it already carries
+# `Conflicts=getty@tty1.service`, so systemd frees tty1 before greetd starts.
+# Nothing does that for any other VT - point this at vt2 and greetd may find
+# it occupied, come up without usable seat/VT info, and then pam_systemd (which
+# is `-session optional`, so it fails silently) registers no logind session.
+# libseat then has nothing to take control of and niri dies with ENOSYS.
+# Rescue consoles are unaffected: logind's autovt spawns a getty on tty2-6 on
+# demand, so Ctrl+Alt+F3 still gets you a shell.
+[terminal]
+vt = 1
+
+[default_session]
+command = "/usr/bin/elvos-login"
+user = "greeter"

@@ -1,0 +1,17 @@
+#%PAM-1.0
+
+# Distro default minus `auth required pam_securetty.so`.
+#
+# pam_securetty only ever affects root, and it needs the application to fill
+# in PAM_TTY. greetd is a daemon rather than a getty, so it sets no PAM_TTY,
+# the module matches nothing in /etc/securetty and denies root on every VT.
+# Dropping it is what makes root usable at the greeter - which is the only way
+# in on the live image, where no regular user exists yet.
+#
+# The rest is unchanged, and that matters: system-local-login is what pulls in
+# pam_systemd, and without the logind session it registers, niri cannot take
+# DRM master through libseat.
+auth       requisite    pam_nologin.so
+auth       include      system-local-login
+account    include      system-local-login
+session    include      system-local-login
