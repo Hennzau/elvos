@@ -1,0 +1,7 @@
+# $HOME is an idmapped systemd-homed mount, which cannot hold container
+# layers: chowning them into the subuid range fails with EOVERFLOW. Keep the
+# graph root on the plain root filesystem instead. runroot is left alone -
+# podman defaults it to /run/user/$UID/containers, which is tmpfs and fine.
+[storage]
+driver = "overlay"
+graphroot = "/var/lib/elvos/containers/{{ .chezmoi.username }}"

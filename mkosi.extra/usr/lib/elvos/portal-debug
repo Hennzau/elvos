@@ -1,0 +1,136 @@
+#!/bin/bash
+# Capture everything needed to work out why a captive portal will not let you
+# through. Read-only: it changes no system state and needs no privileges, so
+# it is safe to run while stuck behind a portal. Every probe is pinned to the
+# wireless link, so a second interface cannot answer in its place.
+#
+# usage: portal-debug [link] [outfile]
+
+set -u
+
+dev=${1-}
+if [[ -z $dev ]]; then
+        for d in /sys/class/net/*/wireless; do
+                dev=$(basename "$(dirname "$d")")
+                break
+        done
+fi
+out=${2-$HOME/portal-debug.txt}
+jar=$(mktemp)
+trap 'rm -f "$jar"' EXIT
+
+# -s so a failure prints nothing, --interface so nothing else can answer.
+# curl still emits the -w line on failure, so branch on the code rather than
+# the exit status, or every failure prints twice.
+probe() {
+        local o
+        o=$(curl -s -m 10 --interface "$dev" -o /dev/null \
+                -w 'code=%{http_code} ip=%{remote_ip} redirect=%{redirect_url}' "$1" 2>/dev/null)
+        case $o in
+        code=000*) echo "UNREACHABLE (dropped or timed out)" ;;
+        *) echo "$o" ;;
+        esac
+}
+
+main() {
+        echo "=== elvos portal-debug $(date -Is) dev=$dev ==="
+
+        echo
+        echo "--- link ---"
+        ip -brief addr show "$dev"
+        ip route show dev "$dev"
+        gw=$(ip -json route show default dev "$dev" |
+                python3 -c 'import json,sys; r=json.load(sys.stdin); print(r[0].get("gateway","") if r else "")')
+        echo "gateway=${gw:-none}"
+
+        echo
+        echo "--- what DHCP handed out (6=DNS, 15=domain, 114=portal URI) ---"
+        networkctl status "$dev" --json=short 2>/dev/null | python3 -c '
+import json,sys,socket
+d=json.load(sys.stdin)
+for o in d.get("DHCPv4Client",{}).get("Lease",{}).get("Message",{}).get("options",[]):
+    t,h=o["tag"],o["data"]
+    if t in (6,3,42):
+        v=", ".join(socket.inet_ntoa(bytes.fromhex(h[i:i+8])) for i in range(0,len(h),8))
+    elif t in (15,114,12):
+        v=bytes.fromhex(h).decode("utf8","replace")
+    else:
+        continue
+    print(f"  option {t}: {v}")
+' 2>/dev/null || echo "  (no DHCPv4 lease detail)"
+
+        echo
+        echo "--- resolvers ---"
+        resolvectl status "$dev" 2>/dev/null | sed -n '1,12p'
+
+        echo
+        echo "--- is DNS hijacked? (same name, three servers, bound to link) ---"
+        for s in "$gw" $(resolvectl dns "$dev" 2>/dev/null | sed 's/.*: //') 1.1.1.1; do
+                [[ -n $s ]] || continue
+                printf '  %-16s -> ' "$s"
+                timeout 6 dig +short +tries=1 "@$s" -b "$(ip -4 -json addr show "$dev" |
+                        python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["addr_info"][0]["local"])')" \
+                        detectportal.firefox.com A 2>/dev/null | tr '\n' ' ' || true
+                echo
+        done
+
+        echo
+        echo "--- where does plain HTTP get intercepted? ---"
+        for u in "http://${gw}/" \
+                "http://connectivitycheck.gstatic.com/generate_204" \
+                "http://detectportal.firefox.com/canonical.html" \
+                "http://neverssl.com/"; do
+                printf '  %-56s ' "$u"
+                probe "$u"
+        done
+
+        echo
+        echo "--- follow the chain to the login page (cookies kept) ---"
+        curl -sSL -m 25 --interface "$dev" -c "$jar" -b "$jar" -D - \
+                -o /tmp/portal-page.html \
+                -w '\nFINAL url=%{url_effective} code=%{http_code} hops=%{num_redirects}\n' \
+                "http://detectportal.firefox.com/canonical.html" 2>&1 |
+                grep -iE '^(HTTP/|location:|set-cookie:|refresh:|FINAL )' | head -40
+
+        echo
+        echo "--- cookies the portal set ---"
+        # Netscape jar: field 6 is the cookie name, 7 the value - print the
+        # name only, so a session token never lands in the pasted report.
+        if ! grep -v '^#' "$jar" 2>/dev/null | grep -q .; then
+                echo "  (none - a portal that sets no cookie cannot remember you logged in)"
+        else
+                grep -v '^#' "$jar" | awk 'NF {print "  "$1"  "$6}' | head -20
+        fi
+
+        echo
+        echo "--- forms on that page (this is what the browser POSTs) ---"
+        python3 -c '
+import sys,html.parser
+class P(html.parser.HTMLParser):
+    def __init__(s):
+        super().__init__(); s.inform=False
+    def handle_starttag(s,t,a):
+        d=dict(a)
+        if t=="form":
+            s.inform=True
+            print(f"  FORM action={d.get(\"action\")!r} method={d.get(\"method\",\"get\")!r}")
+        elif t in ("input","select","button") and s.inform:
+            print(f"    {t} name={d.get(\"name\")!r} type={d.get(\"type\")!r} value={d.get(\"value\")!r}")
+    def handle_endtag(s,t):
+        if t=="form": s.inform=False
+try: P().feed(open("/tmp/portal-page.html",encoding="utf8",errors="replace").read())
+except Exception as e: print("  (could not parse:",e,")")
+' 2>/dev/null
+
+        echo
+        echo "--- meta refresh / JS redirects in the page ---"
+        grep -oiE '<meta[^>]+http-equiv=["'"'"']?refresh[^>]*>|location\.(href|replace)[^;]{0,120}' \
+                /tmp/portal-page.html 2>/dev/null | head -10 || echo "  (none)"
+
+        echo
+        echo "=== end. page saved at /tmp/portal-page.html ==="
+}
+
+main 2>&1 | tee "$out"
+echo
+echo "wrote $out"
