@@ -6,7 +6,7 @@ import Quickshell.Wayland
 Item {
     id: root
 
-    property int dimSeconds: 10
+    property int dimSeconds: 30
     property int sleepSeconds: 300
     property int dimPercent: 10
     property int restorePercent: -1

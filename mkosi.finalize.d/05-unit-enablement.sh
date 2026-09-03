@@ -19,6 +19,9 @@ units=(
         systemd-timesyncd.service
 
         bluetooth.service
+
+        libvirtd.socket
+        virtlogd.socket
 )
 
 systemctl --root="$BUILDROOT" enable "${units[@]}"

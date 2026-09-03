@@ -2,9 +2,6 @@ pragma Singleton
 
 import QtQuick
 
-// Mirrors .chezmoidata/palette.yml. Deliberately not templated: these run out
-// of /usr, before and outside any user session, so chezmoi never sees them.
-// Keep the two in step by hand.
 QtObject {
     readonly property color canvas: "#dcdcdd"
     readonly property color surface: "#ebebec"

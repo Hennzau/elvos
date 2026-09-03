@@ -1,4 +1,5 @@
 #!/bin/sh
+
 src=""
 if command -v pactl >/dev/null 2>&1; then
         src=$(pactl list short sources 2>/dev/null |
@@ -37,6 +38,10 @@ if [ -n "$src" ] || [ -n "$gl" ]; then
                 a=$1
                 shift
                 case $a in
+                sdl|sdl,*)
+                        a="gtk,grab-on-hover=on,zoom-to-fit=on${a#sdl}"
+                        a=${a%,}
+                        ;;
                 *driver=pipewire*|pipewire,*)
                         case $a in
                         *in.name=*) ;;

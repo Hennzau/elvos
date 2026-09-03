@@ -124,9 +124,10 @@ binds {
 
     Mod+D { spawn "fuzzel"; }
     Mod+I { spawn-sh "elvos-lock & sleep 0.3; systemctl suspend"; }
-    Mod+P { spawn "elvos-lock"; }
+    Mod+P allow-inhibiting=false { spawn "elvos-lock"; }
     Mod+N { spawn "elvos-mirror"; }
     Mod+Shift+P { power-off-monitors; }
+    Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
 
     XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%+"; }
     XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
@@ -172,7 +173,7 @@ binds {
 
     Mod+Shift+A { close-window; }
     Mod+Return { spawn "alacritty"; }
-    Mod+Shift+E { quit; }
+    Mod+Shift+E allow-inhibiting=false { quit; }
 
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
