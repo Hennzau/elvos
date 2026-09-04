@@ -83,14 +83,12 @@ def "elvos config reset" [] {
     elvos config list
     | lines
     | each { |it| $env.HOME | path join $it }
-    | where { |it| not ($it | str ends-with "chezmoi.toml") }
+    | where { |it| not (($it | str ends-with "chezmoi.toml") or ($it | str ends-with "niri/monitors.kdl")) }
     | each { |it| rm $it }
 
     elvos config apply
 }
 
-# Enrolment, not a toggle: this writes the wg0 netdev and network files once
-# from a wg-quick config. `elvos security on` is what uses them afterwards.
 def "elvos security install" [
     config: path                # wg-quick config to enrol
     --manual                    # do not bring wg0 up automatically at boot
@@ -111,10 +109,6 @@ def "elvos security install" [
     print "enrolled. `elvos security on` brings the tunnel up."
 }
 
-# One switch, not two. The tunnel and the encrypted resolver only make sense
-# together: a captive portal needs both out of the way, and leaving either on
-# silently breaks the other - AdGuard stalls on a blocked port 853, and wg0
-# black-holes anything that is not on-link.
 def "elvos security on" [] {
     run0 /usr/lib/elvos/security on
 
@@ -137,7 +131,6 @@ def "elvos security status" [] {
         }
     )
 
-    # Empty means the global AdGuard scope is parked - that is `off`.
     let global = (
         resolvectl status
         | lines

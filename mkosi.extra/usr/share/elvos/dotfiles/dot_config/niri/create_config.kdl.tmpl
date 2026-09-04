@@ -20,13 +20,8 @@ input {
     mouse { accel-profile "flat"; }
 }
 
-output "eDP-1" {
-    mode "2880x1800@120.000"
-}
-
-output "HDMI-A-1" {
-    mode "2560x1440@144.000"
-}
+// Per-machine monitor layout
+include "monitors.kdl"
 
 layout {
     gaps 12
@@ -134,6 +129,12 @@ binds {
     XF86AudioMute { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
     XF86MonBrightnessUp { spawn "brightnessctl" "set" "5%+"; }
     XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
+
+    Mod+TouchpadScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+TouchpadScrollUp cooldown-ms=150 { focus-workspace-up; }
 
     Mod+Left  { focus-column-or-monitor-left; }
     Mod+Down  { focus-window-or-workspace-down; }
